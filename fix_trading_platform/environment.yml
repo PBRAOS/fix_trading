@@ -2,13 +2,14 @@ name: trading
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.10
   - fastapi
   - uvicorn
   - pydantic
   - sqlalchemy
   - psycopg2
   - passlib
+  - fixerio
   - pip
   - pip:
       - python-jose[cryptography]

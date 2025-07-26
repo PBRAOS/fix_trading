@@ -21,7 +21,7 @@ class FIXApplication(fix.Application):
         fix.Session.sendToTarget(order)
 
 def start_fix_engine():
-    settings = fix.SessionSettings("app/trade.cfg")
+    settings = fix.SessionSettings("trade.cfg")
     app = FIXApplication()
     storeFactory = fix.FileStoreFactory(settings)
     logFactory = fix.FileLogFactory(settings)

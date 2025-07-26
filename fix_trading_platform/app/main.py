@@ -35,6 +35,7 @@ class TradeRequest(BaseModel):
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
+    print('REGISTER MALAKAS')
     hashed_pw = get_password_hash(user.password)
     db_user = User(email=user.email, hashed_password=hashed_pw)
     db.add(db_user)
@@ -52,6 +53,7 @@ def login(form_data: TokenRequest, db: Session = Depends(get_db)):
 
 @app.post("/execute-trade")
 def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    print('execute-trade')
     trade = Trade(symbol=req.symbol, quantity=req.quantity, side=req.side, status="sent", user_id=user.id)
     db.add(trade)
     db.commit()
