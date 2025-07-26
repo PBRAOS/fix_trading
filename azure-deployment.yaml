@@ -1,0 +1,23 @@
+name: fix-trading-platform
+type: containerapp
+location: westeurope
+properties:
+  configuration:
+    activeRevisionsMode: Multiple
+    ingress:
+      external: true
+      targetPort: 8000
+    secrets: []
+  template:
+    containers:
+      - name: api
+        image: yourregistry.azurecr.io/fix-trading-platform:latest
+        resources:
+          cpu: 0.5
+          memory: 1.0Gi
+        env:
+          - name: DATABASE_URL
+            value: postgresql://postgres:password@db:5432/trading
+    scale:
+      minReplicas: 1
+      maxReplicas: 3

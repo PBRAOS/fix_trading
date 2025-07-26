@@ -1,0 +1,20 @@
+name: trading
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - fastapi
+  - uvicorn
+  - pydantic
+  - sqlalchemy
+  - psycopg2
+  - passlib
+  - conda-forge::quickfix
+  - pip
+  - pip:
+      - quickfix
+      - python-jose[cryptography]
+      - pycryptodome
+
+
+

@@ -1,0 +1,112 @@
+{
+  "info": {
+    "name": "FIX Trading Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/register",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"secret\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Get Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/token",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "token"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"user@example.com\",\n  \"password\": \"secret\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Execute Trade",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <access_token>"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/execute-trade",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "execute-trade"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"symbol\": \"AAPL\",\n  \"quantity\": 10,\n  \"side\": \"buy\"\n}"
+        }
+      }
+    },
+    {
+      "name": "List Trades",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <access_token>"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/trades",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "trades"
+          ]
+        }
+      }
+    }
+  ]
+}
