@@ -9,7 +9,6 @@ dependencies:
   - sqlalchemy
   - psycopg2
   - passlib
-  - conda-forge::quickfix
   - pip
   - pip:
       - quickfix

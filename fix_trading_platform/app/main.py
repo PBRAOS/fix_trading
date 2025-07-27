@@ -4,15 +4,20 @@ from pydantic import BaseModel
 from models import Base, User, Trade
 from database import engine
 from auth import get_password_hash, authenticate_user, create_access_token, get_current_user
-from fix_handler import start_fix_engine
+from fix_handler import start_fix_engine, send_order
 from fastapi.openapi.utils import get_openapi
 from datetime import timedelta
 from auth import get_db
+import time
+import uvicorn
 
 ###### BUILDING IMAGE
 '''
-docker buildx build --platform linux/amd64 -t fix-trading-platform . --load
+docker buildx build --no-cache --platform linux/amd64 -t fix-trading-platform . --load
 docker buildx build -t fix-trading-platform . --load
+docker buildx build --platform windows/amd64 -t fix-trading-platform .
+docker compose up --build
+
 docker compose up
 '''
 
@@ -57,13 +62,15 @@ def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User =
     trade = Trade(symbol=req.symbol, quantity=req.quantity, side=req.side, status="sent", user_id=user.id)
     db.add(trade)
     db.commit()
-    fix_app.send_order(req.symbol, req.quantity, req.side)
+    #### MOCK METHOD NEED TO SEE THE REAL ONE. # TODO: Panos 26/7/25
+    send_order(req.symbol, req.quantity, req.side)
     return {"status": "sent", "trade_id": trade.id}
 
 @app.get("/trades")
 def list_trades(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     return db.query(Trade).filter(Trade.user_id == user.id).all()
 
+print("defining custom_openapi")
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -85,5 +92,14 @@ def custom_openapi():
             method.setdefault("security", []).append({"BearerAuth": []})
     app.openapi_schema = openapi_schema
     return app.openapi_schema
-
+print('IM BEFORE custom_openapi')
 app.openapi = custom_openapi
+print('IM AFTER custom_openapi')
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8000
+    )

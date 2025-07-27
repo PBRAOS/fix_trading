@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 
-DATABASE_URL = "postgresql://postgres:Fraoules12@localhost:5432/db"
+DATABASE_URL = "postgresql://postgres:Fraoules12@db:5432/db"
 
 # Retry logic for DB connection
 max_tries = 10

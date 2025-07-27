@@ -4,8 +4,8 @@ services:
     image: postgres:14
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: trading
+      POSTGRES_PASSWORD: Fraoules12
+      POSTGRES_DB: db
     ports:
       - "5432:5432"
     volumes:
@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/trading
+      - DATABASE_URL=postgresql://postgres:Fraoules12@localhost:5432/db
 
 volumes:
   pgdata:
