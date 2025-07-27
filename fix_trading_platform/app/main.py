@@ -59,12 +59,36 @@ def login(form_data: TokenRequest, db: Session = Depends(get_db)):
 
 @app.post("/execute-trade")
 def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    print('execute-trade')
+
+    # CREATE THE TRADE TO BE ADDED IN THE DATABASE.
     trade = Trade(symbol=req.symbol, quantity=req.quantity, side=req.side, status="sent", user_id=user.id)
-    db.add(trade)
-    db.commit()
+
+    if req.side == 1:
+        # API ΚΛΗΣΗ ΣΤΟ EQUATION.
+        print('binding-order if buy - Εντολή δέσμευσης')
+
     #### MOCK METHOD NEED TO SEE THE REAL ONE. # TODO: Panos 26/7/25
+    print('execute-trade')
+    # API ΚΛΗΣΗ ΣΤH CRYPTOFINANCE FIX MSG.
     send_order(req.symbol, req.quantity, req.side)
+
+    status = "success"
+    if status == "success":
+
+        if req.side == 1:
+            print('unbinding-order if buy - Εντολή αποδέσμευσης')
+
+            print('debit-order in Equation if buy - Εντολή χρέωσης')
+        else:
+            print('credit-order in Equation if sell - Εντολή πίστωσης')
+
+        # ADD TO DATABASE
+        db.add(trade)
+        db.commit()
+    else:
+        print('unbinding-order if buy - Εντολή αποδέσμευσης - Η εντολή δεν εκτελέστηκε επιτυχώς. Try later.')
+
+
     return {"status": "sent", "trade_id": trade.id}
 
 @app.get("/trades")
