@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
  && ./configure  \
  && make && make install \
  && ls \
- && cd .. && rm -rf quickfix \
+ && cd .. && rm -rf quickfix
  ## && pip install quickfix    # Install the package once its built.
 
 # Copy your application code into the container
