@@ -17,7 +17,7 @@ docker buildx build --no-cache --platform linux/amd64 -t fix-trading-platform . 
 docker buildx build -t fix-trading-platform . --load
 docker buildx build --platform windows/amd64 -t fix-trading-platform .
 docker compose up --build
-
+# uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 docker compose up
 '''
 
@@ -40,7 +40,6 @@ class TradeRequest(BaseModel):
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
-    print('REGISTER MALAKAS')
     hashed_pw = get_password_hash(user.password)
     db_user = User(email=user.email, hashed_password=hashed_pw)
     db.add(db_user)
@@ -92,14 +91,15 @@ def custom_openapi():
             method.setdefault("security", []).append({"BearerAuth": []})
     app.openapi_schema = openapi_schema
     return app.openapi_schema
-print('IM BEFORE custom_openapi')
+## print('IM BEFORE custom_openapi')
 app.openapi = custom_openapi
-print('IM AFTER custom_openapi')
+## print('IM AFTER custom_openapi')
 
 
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="127.0.0.1",
-        port=8000
+        port=8000,
+        reload=True
     )

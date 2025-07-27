@@ -2,8 +2,15 @@ import time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
+import getpass
 
-DATABASE_URL = "postgresql://postgres:Fraoules12@db:5432/db"
+print(getpass.getuser())
+if getpass.getuser()=='pbraimakis':
+    # LOCAL MAC
+    DATABASE_URL = "postgresql://postgres:Fraoules12@localhost:5433/db"
+else:
+    # DOCKER
+    DATABASE_URL = "postgresql://postgres:Fraoules12@db:5432/db"
 
 # Retry logic for DB connection
 max_tries = 10
