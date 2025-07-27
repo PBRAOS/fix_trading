@@ -11,25 +11,29 @@ COPY environment.yml .
 RUN conda env create -f environment.yml
 
 # List files to confirm build context
-RUN echo "📦 Files in /app:" && ls -al /app
+RUN echo "Files in /app:" && ls -al /app
 
-# Set shell to use the 'trading' conda environment for all subsequent commands
+# Use the 'trading' env for everything after this
 SHELL ["conda", "run", "--no-capture-output", "-n", "trading", "/bin/bash", "-c"]
 
-# Install system packages and build quickfix from source
+# Now install QuickFIX from source (in conda env context)
 RUN apt-get update && apt-get install -y \
     build-essential \
     libboost-all-dev \
     cmake \
     git \
+    libtool \
+    autoconf \
+    automake \
+    swig \
  && git clone https://github.com/quickfix/quickfix.git \
- && cd quickfix  \
- && ./bootstrap  \
- && ./configure  \
- && make && make install \
- && ls \
- && cd .. && rm -rf quickfix
- ## && pip install quickfix    # Install the package once its built.
+ && cd quickfix \
+ && ./bootstrap \
+ && ./configure --with-python \
+ && make -j$(nproc) \
+ && make install \
+ && cd python \
+ && python setup.py install
 
 # Copy your application code into the container
 COPY app/ ./app

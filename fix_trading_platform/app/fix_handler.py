@@ -51,7 +51,7 @@ def send_order(symbol, quantity, side):
         fix.HandlInst('1'),
         fix.Symbol(symbol),
         fix.Side(side),
-        fix.TransactTime(datetime.utcnow()),
+        fix.TransactTime(datetime.utcnow()), ## TODO: NEED TO DEBUG THIS. PANOS. 27.07.25
         fix.OrdType(fix.OrdType_MARKET)
     )
     order.setField(fix.OrderQty(quantity))
