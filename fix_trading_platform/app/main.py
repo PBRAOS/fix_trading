@@ -15,14 +15,16 @@ import uvicorn
 '''
 docker buildx build --no-cache --platform linux/amd64 -t fix-trading-platform . --load
 docker buildx build -t fix-trading-platform . --load
-docker buildx build --platform windows/amd64 -t fix-trading-platform .
 docker compose up --build
-# uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 docker compose up
 '''
+## DEBUG EXECUTE from CMD
+# uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
+
+# Start the FIX engine.
 fix_app = start_fix_engine()
 
 class UserCreate(BaseModel):

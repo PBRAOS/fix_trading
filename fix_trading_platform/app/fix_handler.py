@@ -1,5 +1,4 @@
 import quickfix as fix
-import quickfix44 as fix44
 import uuid
 from datetime import datetime
 
@@ -38,6 +37,7 @@ def start_fix_engine():
     storeFactory = fix.FileStoreFactory("store")
     logFactory = fix.FileLogFactory("log")
 
+    # Setup the Socket initiator.
     initiator = fix.SocketInitiator(app, storeFactory, settings, logFactory)
     initiator.start()
     print("FIX engine started.")
@@ -46,7 +46,7 @@ def send_order(symbol, quantity, side):
     if not initiator or not initiator.getSessions():
         raise Exception("FIX session not started or not logged in.")
 
-    order = fix44.NewOrderSingle(
+    order = fix.NewOrderSingle(
         fix.ClOrdID(str(uuid.uuid4())),
         fix.HandlInst('1'),
         fix.Symbol(symbol),
