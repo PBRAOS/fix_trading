@@ -8,8 +8,8 @@ from fix_handler import start_fix_engine, send_order
 from fastapi.openapi.utils import get_openapi
 from datetime import timedelta
 from auth import get_db
-import time
 import uvicorn
+from equation_helper import bind_cash, rollback_cash_reservation, finalize_cash
 
 ###### BUILDING IMAGE
 '''
@@ -40,6 +40,10 @@ class TradeRequest(BaseModel):
     quantity: float
     side: str
 
+@app.get("/")
+def root():
+    return {"msg": "Hello"}
+
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
     hashed_pw = get_password_hash(user.password)
@@ -66,6 +70,9 @@ def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User =
     if req.side == 1:
         # API ΚΛΗΣΗ ΣΤΟ EQUATION.
         print('binding-order if buy - Εντολή δέσμευσης')
+        cash_bound = bind_cash(user.id, req.symbol, req.quantity, req.price, db)
+        if not cash_bound:
+            raise HTTPException(status_code=400, detail="Insufficient funds or binding failed")
 
     #### MOCK METHOD NEED TO SEE THE REAL ONE. # TODO: Panos 26/7/25
     print('execute-trade')
@@ -77,17 +84,22 @@ def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User =
 
         if req.side == 1:
             print('unbinding-order if buy - Εντολή αποδέσμευσης')
+            rollback_cash_reservation(user.id, req.symbol, req.quantity, req.price, db)
 
             print('debit-order in Equation if buy - Εντολή χρέωσης')
+            finalize_cash(user.id, req.symbol, req.quantity, req.price, db)
+
         else:
             print('credit-order in Equation if sell - Εντολή πίστωσης')
+            finalize_cash(user.id, req.symbol, req.quantity, req.price, db)
 
         # ADD TO DATABASE
         db.add(trade)
         db.commit()
     else:
         print('unbinding-order if buy - Εντολή αποδέσμευσης - Η εντολή δεν εκτελέστηκε επιτυχώς. Try later.')
-
+        rollback_cash_reservation(user.id, req.symbol, req.quantity, req.price, db)
+        raise HTTPException(status_code=500, detail=f"Trade failed: {str(e)}")
 
     return {"status": "sent", "trade_id": trade.id}
 
@@ -121,11 +133,9 @@ def custom_openapi():
 app.openapi = custom_openapi
 ## print('IM AFTER custom_openapi')
 
-
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="127.0.0.1",
         port=8000,
-        reload=True
-    )
+        reload=True)

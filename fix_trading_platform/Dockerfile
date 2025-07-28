@@ -24,9 +24,7 @@ RUN git clone https://github.com/quickfix/quickfix.git && \
     ./bootstrap && \
     ./configure --with-python && \
     make -j2 && \
-    make install && \
-    cd /app/quickfix/python && \
-    conda run -n trading python setup.py install
+    make install
 
 # Copy your app code
 COPY app/ /app/app
