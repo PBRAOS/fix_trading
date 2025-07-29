@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 
 ## Helper functions to check cash binding
 def bind_cash(user_id, symbol, quantity, price, db: Session):
+
+    ## EQUATION CALL BIND.
+
     # Create a reservation record in the DB
     reservation = CashReservation(
         user_id=user_id,
@@ -17,6 +20,9 @@ def bind_cash(user_id, symbol, quantity, price, db: Session):
     return True
 
 def finalize_cash(user_id, symbol, quantity, price, db: Session):
+
+    ## EQUATION CALL FINALIZE.
+
     # Update the reservation to finalized
     reservation = db.query(CashReservation).filter_by(
         user_id=user_id,
@@ -30,6 +36,9 @@ def finalize_cash(user_id, symbol, quantity, price, db: Session):
         db.commit()
 
 def rollback_cash_reservation(user_id, symbol, quantity, price, db: Session):
+
+    ## EQUATION CALL ROLLBACK.
+
     # Delete the reservation if something fails
     reservation = db.query(CashReservation).filter_by(
         user_id=user_id,

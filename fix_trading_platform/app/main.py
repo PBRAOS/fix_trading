@@ -10,6 +10,7 @@ from datetime import timedelta
 from auth import get_db
 import uvicorn
 from equation_helper import bind_cash, rollback_cash_reservation, finalize_cash
+import random
 
 ###### BUILDING IMAGE
 '''
@@ -20,7 +21,7 @@ docker compose up
 '''
 ## DEBUG EXECUTE from CMD
 # uvicorn main:app --host 127.0.0.1 --port 8000 --reload
-
+## BE CAREFUL WITH THIS Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
@@ -39,6 +40,7 @@ class TradeRequest(BaseModel):
     symbol: str
     quantity: float
     side: str
+    price: float
 
 @app.get("/")
 def root():
@@ -49,9 +51,11 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     hashed_pw = get_password_hash(user.password)
     db_user = User(email=user.email, hashed_password=hashed_pw)
     db.add(db_user)
+    db_user.system_used_id = str(db_user.id).zfill(9)  # SIX DIGITS PADDED with 9 characters
     db.commit()
     db.refresh(db_user)
-    return {"msg": "registered"}
+
+    return {"msg": "registered", "system_used_id": db_user.system_used_id}  # Optional for testing
 
 @app.post("/token")
 def login(form_data: TokenRequest, db: Session = Depends(get_db)):
@@ -75,11 +79,13 @@ def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User =
             raise HTTPException(status_code=400, detail="Insufficient funds or binding failed")
 
     #### MOCK METHOD NEED TO SEE THE REAL ONE. # TODO: Panos 26/7/25
-    print('execute-trade')
+    print('executing trade')
     # API ΚΛΗΣΗ ΣΤH CRYPTOFINANCE FIX MSG.
-    send_order(req.symbol, req.quantity, req.side)
+    send_order(req.symbol, req.quantity, req.side, req.price)
 
-    status = "success"
+    # TODO: NEED TO CHANGE status WHEN IN SIT
+    status = "success"  # Setting status.
+    # ------------------------------------------
     if status == "success":
 
         if req.side == 1:

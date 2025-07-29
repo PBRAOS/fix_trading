@@ -42,9 +42,15 @@ def start_fix_engine():
     initiator.start()
     print("FIX engine started.")
 
-def send_order(symbol, quantity, side):
+def send_order(symbol, quantity, side, price, ord_type="LIMIT"):
     if not initiator or not initiator.getSessions():
         raise Exception("FIX session not started or not logged in.")
+
+    # Determine order type
+    if ord_type.upper() == "MARKET":
+        order_type = fix.OrdType_MARKET
+    else:
+        order_type = fix.OrdType_LIMIT
 
     order = fix.NewOrderSingle(
         fix.ClOrdID(str(uuid.uuid4())),
@@ -53,8 +59,15 @@ def send_order(symbol, quantity, side):
         fix.Side(side),
         fix.TransactTime(datetime.utcnow()), ## TODO: NEED TO DEBUG THIS. PANOS. 27.07.25
         fix.OrdType(fix.OrdType_MARKET)
+
     )
+
+    # Quantity
     order.setField(fix.OrderQty(quantity))
+
+    # Set price only for LIMIT orders
+    if order_type == fix.OrdType_LIMIT:
+        order.setField(fix.Price(price))
 
     session_id = initiator.getSessions()[0]
     fix.Session.sendToTarget(order, session_id)

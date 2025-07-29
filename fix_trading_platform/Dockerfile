@@ -7,6 +7,8 @@ COPY environment.yml .
 # Create the Conda environment
 RUN conda env create -f environment.yml
 
+SHELL ["conda", "run", "-n", "trading", "/bin/bash", "-c"]
+
 # Install system packages (not inside conda env!)
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -24,7 +26,7 @@ RUN git clone https://github.com/quickfix/quickfix.git && \
     ./bootstrap && \
     ./configure --with-python && \
     make -j2 && \
-    make install
+    make install &&
 
 # Copy your app code
 COPY app/ /app/app
