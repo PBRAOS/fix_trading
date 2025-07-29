@@ -51,11 +51,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     hashed_pw = get_password_hash(user.password)
     db_user = User(email=user.email, hashed_password=hashed_pw)
     db.add(db_user)
-    db_user.system_used_id = str(db_user.id).zfill(9)  # SIX DIGITS PADDED with 9 characters
     db.commit()
     db.refresh(db_user)
 
-    return {"msg": "registered", "system_used_id": db_user.system_used_id}  # Optional for testing
+    system_used_id = str(db_user.id).zfill(10)
+
+    return {"msg": "registered", "system_used_id": system_used_id}  # Optional for testing
 
 @app.post("/token")
 def login(form_data: TokenRequest, db: Session = Depends(get_db)):
