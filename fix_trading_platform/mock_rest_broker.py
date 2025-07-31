@@ -18,7 +18,7 @@ def place_order(order: OrderRequest):
 
     broker_order_id = str(uuid.uuid4())
 
-    print(f"✅ Order received by mock broker: {order.dict()}")
+    print(f"Order received by mock broker: {order.dict()}")
     return {
         "status": "accepted",
         "broker_order_id": broker_order_id
