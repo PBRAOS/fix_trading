@@ -20,5 +20,13 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:Fraoules12@localhost:5432/db
 
+  mock_rest_broker:
+    build:
+      context: .
+      dockerfile: Dockerfile.mockbroker
+    ports:
+      - "9000:9000"
+    command: uvicorn mock_rest_broker:app --host 0.0.0.0 --port 9000 --reload
+
 volumes:
   pgdata:

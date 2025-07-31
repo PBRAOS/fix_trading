@@ -8,8 +8,8 @@ COPY environment.yml .
 RUN conda env create -f environment.yml
 
 # Copy your app code
-COPY app/ /app/app
-WORKDIR /app/app
+COPY app/ ./app
+WORKDIR ./app
 
 EXPOSE 8000
 
