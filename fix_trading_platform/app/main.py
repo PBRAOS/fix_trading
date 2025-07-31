@@ -40,6 +40,7 @@ class TradeRequest(BaseModel):
     symbol: str
     quantity: float
     side: str
+    price: float
 
 @app.get("/")
 def root():
@@ -96,7 +97,7 @@ async def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: 
         return {"status": trade.status, "trade_id": trade.id}
 
     except Exception as e:
-        rollback_cash_reservation(user.id, req.symbol, req.quantity, req.price)
+        #rollback_cash_reservation(user.id, req.symbol, req.quantity, req.price)
         raise HTTPException(status_code=500, detail=str(e))
 
 

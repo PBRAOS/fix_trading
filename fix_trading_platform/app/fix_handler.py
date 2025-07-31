@@ -1,6 +1,6 @@
 import quickfix as fix
-import quickfix44 as fix44
-import uuid
+#import quickfix44 as fix44
+#import uuid
 from datetime import datetime
 
 initiator = None  # Will hold the Socket Initiator instance

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from models import User
 from database import SessionLocal
 
-SECRET_KEY = "your_secret_key_here"
+SECRET_KEY = "PIREAUS_FRONT_END_ADMIN_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

@@ -20,6 +20,7 @@ class Trade(Base):
     symbol = Column(String)
     quantity = Column(Float)
     side = Column(String)
+    price = Column(Float)
     status = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -36,5 +37,6 @@ class CashReservation(Base):
     quantity = Column(Float)
     price = Column(Float)
     is_finalized = Column(Boolean, default=False)
+
     # Relationship
     user = relationship("User", back_populates="reservations")
