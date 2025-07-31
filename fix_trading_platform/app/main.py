@@ -4,13 +4,13 @@ from pydantic import BaseModel
 from models import Base, User, Trade
 from database import engine
 from auth import get_password_hash, authenticate_user, create_access_token, get_current_user
-from fix_handler import start_fix_engine, send_order
+# from fix_handler import start_fix_engine
 from fastapi.openapi.utils import get_openapi
 from datetime import timedelta
 from auth import get_db
 import uvicorn
 from equation_helper import bind_cash, rollback_cash_reservation, finalize_cash
-import random
+from rest_broker import send_order_rest
 
 ###### BUILDING IMAGE
 '''
@@ -26,7 +26,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Start the FIX engine.
-fix_app = start_fix_engine()
+#fix_app = start_fix_engine()
 
 class UserCreate(BaseModel):
     email: str
@@ -40,7 +40,6 @@ class TradeRequest(BaseModel):
     symbol: str
     quantity: float
     side: str
-    price: float
 
 @app.get("/")
 def root():
@@ -48,12 +47,16 @@ def root():
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
     hashed_pw = get_password_hash(user.password)
     db_user = User(email=user.email, hashed_password=hashed_pw)
     db.add(db_user)
-    db_user.system_used_id = str(db_user.id).zfill(9)  # SIX DIGITS PADDED with 9 characters
     db.commit()
     db.refresh(db_user)
+    db_user.system_used_id = str(db_user.id).zfill(9)  # SIX DIGITS PADDED with 9 characters
 
     return {"msg": "registered", "system_used_id": db_user.system_used_id}  # Optional for testing
 
@@ -66,48 +69,36 @@ def login(form_data: TokenRequest, db: Session = Depends(get_db)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post("/execute-trade")
-def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+async def execute_trade(req: TradeRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    cash_bound = bind_cash(user.id, req.symbol, req.quantity, req.price)
+    if not cash_bound:
+        raise HTTPException(status_code=400, detail="Insufficient funds")
 
-    # CREATE THE TRADE TO BE ADDED IN THE DATABASE.
-    trade = Trade(symbol=req.symbol, quantity=req.quantity, side=req.side, status="sent", user_id=user.id)
-
-    if req.side == 1:
-        # API ΚΛΗΣΗ ΣΤΟ EQUATION.
-        print('binding-order if buy - Εντολή δέσμευσης')
-        cash_bound = bind_cash(user.id, req.symbol, req.quantity, req.price, db)
-        if not cash_bound:
-            raise HTTPException(status_code=400, detail="Insufficient funds or binding failed")
-
-    #### MOCK METHOD NEED TO SEE THE REAL ONE. # TODO: Panos 26/7/25
-    print('executing trade')
-    # API ΚΛΗΣΗ ΣΤH CRYPTOFINANCE FIX MSG.
-    send_order(req.symbol, req.quantity, req.side, req.price)
-
-    # TODO: NEED TO CHANGE status WHEN IN SIT
-    status = "success"  # Setting status.
-    # ------------------------------------------
-    if status == "success":
-
-        if req.side == 1:
-            print('unbinding-order if buy - Εντολή αποδέσμευσης')
-            rollback_cash_reservation(user.id, req.symbol, req.quantity, req.price, db)
-
-            print('debit-order in Equation if buy - Εντολή χρέωσης')
-            finalize_cash(user.id, req.symbol, req.quantity, req.price, db)
-
-        else:
-            print('credit-order in Equation if sell - Εντολή πίστωσης')
-            finalize_cash(user.id, req.symbol, req.quantity, req.price, db)
-
-        # ADD TO DATABASE
+    try:
+        trade = Trade(
+            symbol=req.symbol,
+            quantity=req.quantity,
+            side=req.side,
+            price=req.price,
+            status="pending",
+            user_id=user.id
+        )
         db.add(trade)
         db.commit()
-    else:
-        print('unbinding-order if buy - Εντολή αποδέσμευσης - Η εντολή δεν εκτελέστηκε επιτυχώς. Try later.')
-        rollback_cash_reservation(user.id, req.symbol, req.quantity, req.price, db)
-        raise HTTPException(status_code=500, detail=f"Trade failed: {str(e)}")
+        db.refresh(trade)
 
-    return {"status": "sent", "trade_id": trade.id}
+        response = await send_order_rest(req.symbol, req.quantity, req.side, req.price, user.id)
+        trade.status = response.get("status", "unknown")
+        trade.broker_order_id = response.get("broker_order_id", None)
+        db.commit()
+
+        finalize_cash(user.id, req.symbol, req.quantity, req.price)
+        return {"status": trade.status, "trade_id": trade.id}
+
+    except Exception as e:
+        rollback_cash_reservation(user.id, req.symbol, req.quantity, req.price)
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/trades")
 def list_trades(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
