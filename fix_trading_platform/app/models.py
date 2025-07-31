@@ -23,6 +23,8 @@ class Trade(Base):
     status = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
+    broker_order_id = Column(String, nullable=True)
+
     # Relationship
     user = relationship("User", back_populates="trades")
 

@@ -1,4 +1,5 @@
 import quickfix as fix
+import quickfix44 as fix44
 import uuid
 from datetime import datetime
 
@@ -30,6 +31,31 @@ class Application(fix.Application):
     def onMessage(self, message, sessionID):
         print("Application message received.")
 
+    def send_order(self):
+        if not initiator or not initiator.getSessions():
+            raise Exception("FIX session not started or not logged in.")
+
+        """Request sample new order single"""
+        message = fix.Message()
+        header = message.getHeader()
+
+        header.setField(fix.MsgType(fix.MsgType_NewOrderSingle))  # 39 = D
+
+        message.setField(fix.ClOrdID(self.genClOrdID()))  # 11 = Unique Sequence Number
+        message.setField(fix.Side(fix.Side_BUY))  # 43 = 1 BUY
+        message.setField(fix.Symbol("MSFT"))  # 55 = MSFT
+        message.setField(fix.OrderQty(10000))  # 38 = 1000
+        message.setField(fix.Price(100))
+        message.setField(fix.OrdType(fix.OrdType_LIMIT))  # 40=2 Limit Order
+        message.setField(fix.HandlInst(fix.HandlInst_MANUAL_ORDER_BEST_EXECUTION))  # 21 = 3
+        message.setField(fix.TimeInForce('0'))
+        message.setField(fix.Text("NewOrderSingle"))
+        trstime = fix.TransactTime()
+        trstime.setString(datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")[:-3])
+        message.setField(trstime)
+
+        fix.Session.sendToTarget(message, self.sessionID)
+
 def start_fix_engine():
     global initiator
     settings = fix.SessionSettings("trade.cfg")
@@ -42,20 +68,3 @@ def start_fix_engine():
     initiator.start()
     print("FIX engine started.")
 
-def send_order(symbol, quantity, side):
-    if not initiator or not initiator.getSessions():
-        raise Exception("FIX session not started or not logged in.")
-
-    order = fix.NewOrderSingle(
-        fix.ClOrdID(str(uuid.uuid4())),
-        fix.HandlInst('1'),
-        fix.Symbol(symbol),
-        fix.Side(side),
-        fix.TransactTime(datetime.utcnow()), ## TODO: NEED TO DEBUG THIS. PANOS. 27.07.25
-        fix.OrdType(fix.OrdType_MARKET)
-    )
-    order.setField(fix.OrderQty(quantity))
-
-    session_id = initiator.getSessions()[0]
-    fix.Session.sendToTarget(order, session_id)
-    print("Order sent:", order.toString())
