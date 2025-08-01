@@ -1,8 +1,8 @@
 version: '3.10'
 services:
-  db:
+  mssql_db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: db
+    container_name: mssql_db
     environment:
       SA_PASSWORD: "Fr@0ules123!"
       ACCEPT_EULA: "Y"
@@ -10,21 +10,19 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - mssqldata:/var/opt/mssql
-    healthcheck:
-      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "SA", "-P", "Fr@0ules123", "-Q", "SELECT 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+          - mssql_data:/var/opt/mssql
 
   api:
     build: .
     depends_on:
-      - db
+      - mssql_db
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mssql+pytds://MSSQL:Fr@0ules123!@db:1433/db?driver=ODBC+Driver+17+for+SQL+Server
+      - DB_SERVER=db
+      - DB_USER=sa
+      - DB_PASSWORD=Fr@0ules123!
+      - DB_NAME=master
 
   mock_rest_broker:
     build:
@@ -35,4 +33,4 @@ services:
     command: uvicorn mock_rest_broker:app --host 0.0.0.0 --port 9000 --reload
 
 volumes:
-  mssqldata:
+   mssql_data:

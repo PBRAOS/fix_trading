@@ -12,5 +12,5 @@ dependencies:
   - pip:
       - python-jose[cryptography]
       - pycryptodome
-      - sqlalchemy-pytds
-      - python-tds
+      - sqlalchemy
+      - pyodbc
