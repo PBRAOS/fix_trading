@@ -8,12 +8,9 @@ dependencies:
   - pydantic
   - sqlalchemy
   - httpx
-  - psycopg2
   - passlib
+  - pyodbc
   - pip
   - pip:
       - python-jose[cryptography]
       - pycryptodome
-
-
-
