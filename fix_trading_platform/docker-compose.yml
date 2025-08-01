@@ -12,7 +12,7 @@ services:
     volumes:
       - mssqldata:/var/opt/mssql
     healthcheck:
-      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "SA", "-P", "Fraoules12", "-Q", "SELECT 1" ]
+      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "SA", "-P", "Fr@0ules123", "-Q", "SELECT 1" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -24,7 +24,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mssql+pytds://sa:Fr@0ules123!@db:1433/db?driver=ODBC+Driver+17+for+SQL+Server
+      - DATABASE_URL=mssql+pytds://MSSQL:Fr@0ules123!@db:1433/db?driver=ODBC+Driver+17+for+SQL+Server
 
   mock_rest_broker:
     build:

@@ -13,3 +13,4 @@ dependencies:
       - python-jose[cryptography]
       - pycryptodome
       - sqlalchemy-pytds
+      - python-tds
