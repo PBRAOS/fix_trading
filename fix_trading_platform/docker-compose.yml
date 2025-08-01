@@ -19,7 +19,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mssql+pyodbc://sa:Fr@0ules123!@db:1433/db?driver=ODBC+Driver+17+for+SQL+Server
+      - DATABASE_URL=mssql+pytds://sa:Fr@0ules123!@db:1433/db?driver=ODBC+Driver+17+for+SQL+Server
 
   mock_rest_broker:
     build:

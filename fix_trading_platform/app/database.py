@@ -7,10 +7,10 @@ import getpass
 print(getpass.getuser())
 if getpass.getuser() == 'pbraimakis':
     # LOCAL MAC
-    DATABASE_URL = "mssql+pyodbc://MySQL:Fr@0ules123!@localhost:1433/db?driver=ODBC+Driver+17+for+SQL+Server"
+    DATABASE_URL = "mssql+pytds://MySQL:Fr@0ules123!@localhost:1433/db?driver=ODBC+Driver+17+for+SQL+Server"
 else:
     # DOCKER
-    DATABASE_URL = "mssql+pyodbc://MySQL:Fr@0ules123!@mssql:1433/db?driver=ODBC+Driver+17+for+SQL+Server"
+    DATABASE_URL = "mssql+pytds://MySQL:Fr@0ules123!@mssql:1433/db?driver=ODBC+Driver+17+for+SQL+Server"
 
 # Retry logic for DB connection
 max_tries = 10
