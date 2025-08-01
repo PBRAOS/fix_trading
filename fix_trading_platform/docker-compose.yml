@@ -1,15 +1,16 @@
 version: '3.10'
 services:
   db:
-    image: postgres:14
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Fraoules12
-      POSTGRES_DB: db
+      SA_PASSWORD: "Fr@0ules123!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
     ports:
-      - "5432:5432"
+      - "1433:1433"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mssqldata:/var/opt/mssql
 
   api:
     build: .
@@ -18,7 +19,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:Fraoules12@localhost:5432/db
+      - DATABASE_URL=mssql+pyodbc://sa:Fr@0ules123!@db:1433/db?driver=ODBC+Driver+17+for+SQL+Server
 
   mock_rest_broker:
     build:
@@ -29,4 +30,4 @@ services:
     command: uvicorn mock_rest_broker:app --host 0.0.0.0 --port 9000 --reload
 
 volumes:
-  pgdata:
+  mssqldata:
