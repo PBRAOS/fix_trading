@@ -20,16 +20,17 @@ Logs trade to DB
 Sends HTTP POST to mock_broker:9000/orders
 Updates or rolls back cash based on response
 
-2. db (PostgreSQL)
+2. db (MS SQL)
 Role: Relational database for storing users and trades.
 Expected Behavior:
-Exposes PostgreSQL on localhost:5432
+Exposes MSSQL on localhost:1433
 Accepts connections from api via:
 
 bash
 Copy
 Edit
-postgresql://postgres:Fraoules12@db:5432/db
+mssql+pyodbc://MySQL:Fraoules12@mssql:1433/db?driver=ODBC+Driver+17+for+SQL+Server
+
 
 Stores:
 Users (users table)
