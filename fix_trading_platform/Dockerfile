@@ -7,6 +7,10 @@ COPY environment.yml .
 # Create the Conda environment
 RUN conda env create -f environment.yml
 
+# Updating compilers and linux.
+RUN apt-get update && apt-get install -y \
+    gcc g++ unixodbc-dev curl \
+
 # The app code
 COPY app/ ./app
 WORKDIR ./app

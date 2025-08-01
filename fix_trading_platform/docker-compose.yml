@@ -11,6 +11,11 @@ services:
       - "1433:1433"
     volumes:
       - mssqldata:/var/opt/mssql
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "SA", "-P", "Fraoules12", "-Q", "SELECT 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   api:
     build: .

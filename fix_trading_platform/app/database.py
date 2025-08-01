@@ -3,14 +3,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 import getpass
+import os
+
+host = os.getenv("DB_HOST", "db")
 
 print(getpass.getuser())
 if getpass.getuser() == 'pbraimakis':
     # LOCAL MAC
-    DATABASE_URL = "mssql+pytds://MySQL:Fr@0ules123!@localhost:1433/db?driver=ODBC+Driver+17+for+SQL+Server"
+    DATABASE_URL = DATABASE_URL = f"mssql+pytds://MySQL:Fr@0ules123@{host}:1433/db"
 else:
     # DOCKER
-    DATABASE_URL = "mssql+pytds://MySQL:Fr@0ules123!@mssql:1433/db?driver=ODBC+Driver+17+for+SQL+Server"
+    DATABASE_URL = DATABASE_URL = f"mssql+pytds://MySQL:Fr@0ules123@{host}:1433/db"
 
 # Retry logic for DB connection
 max_tries = 10
