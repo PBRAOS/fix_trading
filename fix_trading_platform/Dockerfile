@@ -9,7 +9,7 @@ RUN conda env create -f environment.yml
 
 # Updating compilers and linux.
 RUN apt-get update && apt-get install -y \
-    gcc g++ unixodbc-dev curl \
+    gcc g++ unixodbc-dev
 
 # The app code
 COPY app/ ./app
