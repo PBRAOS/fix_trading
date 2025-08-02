@@ -8,14 +8,15 @@ sys.path.insert(0, '/Users/pbraimakis/PycharmProjects/Azure server Crypto FIX/fi
 ## ----------
 # DEBUGGING
 from troubleshooting_mssql import *
-run_debug()
+#run_debug()
 # #  # 1. Initiate logging.
 # # import logging
 #
 # # #run_injected()
 # #
-run_debug_alchemy()
+#run_debug_alchemy()
 #
+run_debug_alchemy_engine()
 
 print(getpass.getuser())
 if getpass.getuser() == 'pbraimakis':

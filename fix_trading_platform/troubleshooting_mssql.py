@@ -38,25 +38,18 @@ def run_debug_alchemy():
             print(row)
 
 
-# Raw pymssql connection function
-def get_working_connection():
-    return pymssql.connect(
-        server="localhost",
-        port = 1433,
-        user = "sa",
-        password = "pAnaGiotis_b",
-        database = "main")
 
-def run_injected():
-    # Inject into SQLAlchemy using creator
-    engine: Engine = create_engine(
-        "mssql+pymssql://",  # URL is ignored when using `creator`
-        creator=get_working_connection,
-        poolclass=StaticPool  # Optional: disables pooling (simpler for local testing)
+def run_debug_alchemy_engine():
+
+    url_object = URL.create(
+        "mssql+pymssql",
+        username="pbraos",
+        password="Fr@oules12",
+        host="localhost",
+        database="master",
     )
 
-    # Run a query
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT name FROM sys.databases"))
-        for row in result:
-            print(row)
+    # SQLAlchemy connection string using pymssql
+    engine = create_engine(url_object)
+    engine.connect()
+    return engine
