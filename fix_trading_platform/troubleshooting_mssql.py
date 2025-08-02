@@ -1,5 +1,5 @@
 import pymssql
-from sqlalchemy import create_engine, text, engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.pool import StaticPool
 from sqlalchemy import URL
 
@@ -25,8 +25,7 @@ def run_debug_alchemy():
         username="pbraos",
         password="Fr@oules12",
         host="localhost",
-        database="master",
-    )
+        database="master")
 
     # SQLAlchemy connection string using pymssql
     engine = create_engine(url_object)
@@ -46,8 +45,7 @@ def run_debug_alchemy_engine():
         username="pbraos",
         password="Fr@oules12",
         host="localhost",
-        database="master",
-    )
+        database="master")
 
     # SQLAlchemy connection string using pymssql
     engine = create_engine(url_object)
