@@ -21,22 +21,22 @@ import getpass
 print(getpass.getuser())
 if getpass.getuser() == 'pbraimakis':
     # LOCAL MAC
-    ## DATABASE_URL = "mssql+pymssql://sa:pAnaGiotis_b@localhost:1433/master"
+    ## DATABASE_URL = "mssql+pymssql://sa:pAnaGiotis_b@localhost:1433/trading_db"
     url_object = URL.create(
         "mssql+pymssql",
         username="pbraos",
         password="Fr@oules12",
         host="localhost",
-        database="master")
+        database="trading_db")
 else:
     # DOCKER
-    ## DATABASE_URL = "mssql+pymssql://sa:pAnagiotis_b@db:1433/master"
+    ## DATABASE_URL = "mssql+pymssql://sa:pAnagiotis_b@db:1433/trading_db"
     url_object = URL.create(
         "mssql+pymssql",
         username="sa",
         password="pAnagiotis_b",
         host="db",
-        database="master")
+        database="trading_db")
 
 # Retry logic for DB connection
 max_tries = 10

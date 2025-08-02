@@ -21,7 +21,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mssql+pymssql://sa:pAnagiotis_b@db:1433/master
+      - DATABASE_URL=mssql+pymssql://sa:pAnagiotis_b@db:1433/trading_db
 
 
   mock_rest_broker:
