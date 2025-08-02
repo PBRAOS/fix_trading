@@ -1,15 +1,15 @@
 import pymssql
-from sqlalchemy import create_engine, text
-import urllib
+from sqlalchemy import create_engine, text, engine
+from sqlalchemy.pool import StaticPool
+from sqlalchemy import URL
 
 def run_debug():
     conn = pymssql.connect(
         server="localhost",
         port=1433,
-        user="sa",
-        password="Fraoules12345",
-        database="master"
-    )
+        user="pbraos",
+        password="Fr@oules12",
+        database="master")
 
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM sys.databases")
@@ -20,18 +20,42 @@ def run_debug():
 
 def run_debug_alchemy():
 
-    # Connection parameters
-    server = "localhost"
-    port = 1433
-    username = "sa"
-    password = "Fraoules12345"
-    database = "main"
-    quoted_password = urllib.parse.quote_plus(password)
+    url_object = URL.create(
+        "mssql+pymssql",
+        username="pbraos",
+        password="Fr@oules12",
+        host="localhost",
+        database="master",
+    )
 
     # SQLAlchemy connection string using pymssql
-    engine = create_engine(f"mssql+pymssql://{username}:{quoted_password}@{server}:{port}/{database}")
+    engine = create_engine(url_object)
 
     # Test the connection
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT name FROM sys.databases"))
+        for row in result:
+            print(row)
+
+
+# Raw pymssql connection function
+def get_working_connection():
+    return pymssql.connect(
+        server="localhost",
+        port = 1433,
+        user = "sa",
+        password = "pAnaGiotis_b",
+        database = "main")
+
+def run_injected():
+    # Inject into SQLAlchemy using creator
+    engine: Engine = create_engine(
+        "mssql+pymssql://",  # URL is ignored when using `creator`
+        creator=get_working_connection,
+        poolclass=StaticPool  # Optional: disables pooling (simpler for local testing)
+    )
+
+    # Run a query
     with engine.connect() as conn:
         result = conn.execute(text("SELECT name FROM sys.databases"))
         for row in result:

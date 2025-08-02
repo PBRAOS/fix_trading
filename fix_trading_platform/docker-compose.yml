@@ -4,7 +4,9 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: mssql_db
     environment:
-      SA_PASSWORD: "Fraoules12345"
+      SA_USER: SA
+      SA_DB: db
+      SA_PASSWORD: "pAnaGiotis_b"
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Express"
     ports:
@@ -19,10 +21,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_SERVER=db
-      - DB_USER=sa
-      - DB_PASSWORD=Fr@0ules123!
-      - DB_NAME=master
+      - DATABASE_URL=mssql+pymssql://sa:pAnagiotis_b@db:1433/master
+
 
   mock_rest_broker:
     build:
